@@ -1,10 +1,10 @@
-package main;
+package view;
 
-import services.DVDStore;
-import services.Registration;
-import users.Admin;
-import users.Buyer;
-import users.User;
+import controllers.DVDStore;
+import controllers.Registration;
+import models.Admin;
+import models.Buyer;
+import models.User;
 import java.util.ArrayList;
 import java.util.Scanner;
 public class DVDStoreApp {

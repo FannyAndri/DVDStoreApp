@@ -1,4 +1,4 @@
-package users;
+package models;
 
 public class User {
     protected String username;

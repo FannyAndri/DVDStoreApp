@@ -1,6 +1,6 @@
-package services;
+package controllers;
 
-import users.User;
+import models.User;
 import java.util.regex.Pattern;
 
 public class Registration {

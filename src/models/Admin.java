@@ -1,6 +1,6 @@
-package users;
+package models;
 
-import services.DVDStore;
+import controllers.DVDStore;
 
 public class Admin extends User {
     private DVDStore store;

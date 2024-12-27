@@ -1,6 +1,6 @@
-package users;
+package models;
 
-import services.DVDStore;
+import controllers.DVDStore;
 import models.DVD;
 import java.util.ArrayList;
 

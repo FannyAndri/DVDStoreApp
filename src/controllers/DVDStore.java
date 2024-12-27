@@ -1,4 +1,4 @@
-package services;
+package controllers;
 
 import models.DVD;
 import models.MusicDVD;
