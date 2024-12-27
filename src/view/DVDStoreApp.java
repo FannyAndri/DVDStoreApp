@@ -7,11 +7,16 @@ import models.Buyer;
 import models.User;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 public class DVDStoreApp {
+    // List untuk menyimpan pengguna terdaftar
+    private static ArrayList<User> registeredUsers = new ArrayList<>();
+
     public static void main(String[] args) {
         DVDStore store = new DVDStore();
         Admin admin = new Admin("admin", "admin123", store);
         Scanner scanner = new Scanner(System.in);
+
         System.out.println("====== Welcome to the DVD Store! by Kelompok 4 ======");
 
         while (true) {
@@ -19,27 +24,12 @@ public class DVDStoreApp {
             String role = scanner.nextLine();
 
             if (role.equalsIgnoreCase("register")) {
-                System.out.print("Enter username: ");
-                String username = scanner.nextLine();
-                String password;
-                int attempts = 0;
-                while (attempts < Registration.MAX_ATTEMPTS) {
-                    System.out.print("Enter password: ");
-                    password = scanner.nextLine();
-                    User newUser  = Registration.registerUser (username, password);
-                    if (newUser  != null) {
-                        System.out.println("Registration successful!");
-                        Buyer buyer = new Buyer(username, password, store);
-                        buyerMenu(buyer, scanner);
-                        break;
-                    } else {
-                        attempts++;
-                        System.out.println("Attempt " + attempts + " of " + Registration.MAX_ATTEMPTS);
-                        if (attempts == Registration.MAX_ATTEMPTS) {
-                            System.out.println("Account blocked. Please register again.");
-                        }
-                    }
-                }
+                registerUser(scanner);
+                continue;
+            }
+
+            if (role.equalsIgnoreCase("buyer")) {
+                loginAsBuyer(scanner, store);
                 continue;
             }
 
@@ -53,10 +43,38 @@ public class DVDStoreApp {
                     System.out.println("Admin logged in.");
                     adminMenu(admin, scanner);
                 } else {
-                    System.out.println(" Invalid admin credentials.");
+                    System.out.println("Invalid admin credentials.");
                 }
             }
         }
+    }
+
+    private static void registerUser(Scanner scanner) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        User newUser = new User(username, password);
+        registeredUsers.add(newUser);
+        System.out.println("Registration successful! Please login as buyer to access features.");
+    }
+
+    private static void loginAsBuyer(Scanner scanner, DVDStore store) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        for (User user : registeredUsers) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                System.out.println("Buyer logged in.");
+                Buyer buyer = new Buyer(username, password, store);
+                buyerMenu(buyer, scanner);
+                return;
+            }
+        }
+        System.out.println("Invalid buyer credentials.");
     }
 
     private static void adminMenu(Admin admin, Scanner scanner) {
