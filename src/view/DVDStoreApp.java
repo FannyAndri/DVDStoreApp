@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DVDStoreApp {
-    // List untuk menyimpan pengguna terdaftar
+    
     private static ArrayList<User> registeredUsers = new ArrayList<>();
 
     public static void main(String[] args) {
