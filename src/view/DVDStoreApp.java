@@ -18,6 +18,7 @@ public class DVDStoreApp {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("====== Welcome to the DVD Store! by Kelompok 4 ======");
+        System.out.println("");
 
         while (true) {
             System.out.print("Login as (admin/buyer/register): ");
