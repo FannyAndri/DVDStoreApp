@@ -17,7 +17,7 @@ public class DVDStore {
             newDVD = new FilmDVD(name, dvdCounter++, price);
         }
         inventory.add(newDVD);
-        System.out.println("DVD added: " + newDVD.getDetails());
+        System.out.println("DVD added by Admin from Kelompok 4: " + newDVD.getDetails());
     }
 
     public void deleteDVD(String id) {

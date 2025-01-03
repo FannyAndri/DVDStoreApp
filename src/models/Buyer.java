@@ -66,6 +66,7 @@ public class Buyer extends User implements DVDOperations {
         if (!purchasedDVDs.isEmpty()) {
             double totalPrice = store.calculateTotalPrice(purchasedDVDs);
             System.out.println("Total harga yang harus dibayar: " + totalPrice);
+            System.out.println("Terima Kasih telah berbelanja di DVD Store by Kelompok 4!");
         } else {
             System.out.println("Tidak ada DVD yang valid untuk dibeli.");
         }

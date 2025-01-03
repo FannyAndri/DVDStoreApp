@@ -102,10 +102,10 @@ public class DVDStoreApp {
                 String value = scanner.nextLine();
                 admin.searchDVD(criteria, value);
             } else if (choice.equals("5")) {
-                admin.searchByName(choice);
-            } else if (choice.equals("6")) {
                 System.out.print("Admin logged out");
                 break;
+            } else if (choice.equals("6")) {
+                admin.searchByName(choice);
             }
         }
     }
