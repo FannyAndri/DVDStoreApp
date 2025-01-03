@@ -1,6 +1,6 @@
 package models;
 
-public class DVD {
+public abstract class DVD {
     private String name;
     private String id;
     private String type;
@@ -35,7 +35,10 @@ public class DVD {
         return price;
     }
 
-    public String getDetails() {
-        return "DVD [Name: " + name + ", ID: " + id + ", Type: " + type + ", Price: " + price + "]";
+    public abstract String getDetails();
+
+    @Deprecated
+    public String getLegacyDetails() {
+        return "[LEGACY] DVD: " + name + " (" + id + ")";
     }
 }

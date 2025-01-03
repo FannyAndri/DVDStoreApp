@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DVDStoreApp {
-    
+
     private static ArrayList<User> registeredUsers = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -55,8 +55,7 @@ public class DVDStoreApp {
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
-
-        User newUser = new User(username, password);
+        Buyer newUser = new Buyer(username, password, null);
         registeredUsers.add(newUser);
         System.out.println("Registration successful! Please login as buyer to access features.");
     }
@@ -103,6 +102,9 @@ public class DVDStoreApp {
                 String value = scanner.nextLine();
                 admin.searchDVD(criteria, value);
             } else if (choice.equals("5")) {
+                admin.searchByName(choice);
+            } else if (choice.equals("6")) {
+                System.out.print("Admin logged out");
                 break;
             }
         }

@@ -1,6 +1,6 @@
 package models;
 
-public class User {
+public abstract class User {
     protected String username;
     protected String password;
 
@@ -20,4 +20,11 @@ public class User {
     public boolean login(String username, String password) {
         return this.username.equals(username) && this.password.equals(password);
     }
+
+    public abstract void displayRole();
+    
+    public abstract void addDVD(String name, String type, double price); 
+    public abstract void deleteDVD(String id); 
+    public abstract void viewAvailableDVDs(); 
+    public abstract void searchByName(String name);
 }

@@ -10,13 +10,4 @@ public class Registration {
     public static boolean validatePassword(String password) {
         return PASSWORD_PATTERN.matcher(password).matches();
     }
-
-    public static User registerUser(String username, String password) {
-        if (validatePassword(password)) {
-            return new User(username, password);
-        } else {
-            System.out.println("Password must be 8-16 characters long, contain at least one uppercase letter and one digit.");
-            return null;
-        }
-    }
 }
