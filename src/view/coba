@@ -1,0 +1,440 @@
+folder controllers:
+1. DVDStore.java:
+package controllers;
+
+import models.DVD;
+import models.MusicDVD;
+import models.FilmDVD;
+import java.util.ArrayList;
+
+public class DVDStore {
+    private ArrayList<DVD> inventory = new ArrayList<>();
+    private int dvdCounter = 1;
+
+    public void addDVD(String name, String type, double price) {
+        DVD newDVD;
+        if (type.equalsIgnoreCase("music")) {
+            newDVD = new MusicDVD(name, dvdCounter++, price);
+        } else {
+            newDVD = new FilmDVD(name, dvdCounter++, price);
+        }
+        inventory.add(newDVD);
+        System.out.println("DVD added: " + newDVD.getDetails());
+    }
+
+    public void deleteDVD(String id) {
+        DVD dvdToRemove = getDVDById(id);
+        if (dvdToRemove != null) {
+            inventory.remove(dvdToRemove);
+            System.out.println("DVD with ID " + id + " has been deleted.");
+        } else {
+            System.out.println("DVD with ID " + id + " not found.");
+        }
+    }
+
+    public void viewAvailableDVDs() {
+        if (inventory.isEmpty()) {
+            System.out.println("No DVDs available.");
+        } else {
+            for (DVD dvd : inventory) {
+                System.out.println(dvd.getDetails());
+            }
+        }
+    }
+
+    public void searchByName(String name) {
+        for (DVD dvd : inventory) {
+            if (dvd.getName().equalsIgnoreCase(name)) {
+                System.out.println(dvd.getDetails());
+            }
+        }
+    }
+
+    public void searchByID(String id) {
+        for (DVD dvd : inventory) {
+            if (dvd.getId().equals(id)) {
+                System.out.println(dvd.getDetails());
+            }
+        }
+    }
+
+    public void searchByType(String type) {
+        for (DVD dvd : inventory) {
+            if (dvd.getType().equalsIgnoreCase(type)) {
+                System.out.println(dvd.getDetails());
+            }
+        }
+    }
+
+    public double calculateTotalPrice(ArrayList<DVD> purchasedDVDs) {
+        double total = 0.0;
+        for (DVD dvd : purchasedDVDs) {
+            total += dvd.getPrice();
+        }
+        if (purchasedDVDs.size() >= 3 ) {
+            total *= 0.7; 
+        }
+        return total;
+    }
+
+    public DVD getDVDById(String id) {
+        for (DVD dvd : inventory) {
+            if (dvd.getId().equals(id)) {
+                return dvd;
+            }
+        }
+        return null;
+    }
+}
+
+2. Registration.java:
+package controllers;
+
+import models.User;
+import java.util.regex.Pattern;
+
+public class Registration {
+    public static final int MAX_ATTEMPTS = 5;
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Z])(?=.*\\d).{8,16}$");
+
+    public static boolean validatePassword(String password) {
+        return PASSWORD_PATTERN.matcher(password).matches();
+    }
+
+    public static User registerUser(String username, String password) {
+        if (validatePassword(password)) {
+            System.out.println("Registration successful.");
+            return new User(username, password) {
+                @Override
+                public void displayRole() {
+                    System.out.println("Role: Registered User");
+                }
+            };
+        } else {
+            System.out.println("Password must be 8-16 characters long, contain at least one uppercase letter and one digit.");
+            return null;
+        }
+    }
+}
+
+folder models:
+1. Admin.java:
+package models;
+
+import controllers.DVDStore;
+
+public class Admin extends User {
+    private DVDStore store;
+
+    public Admin(String username, String password, DVDStore store) {
+        super(username, password);
+        this.store = store;
+    }
+
+    @Override
+    public void displayRole() {
+        System.out.println("Role: Admin");
+    }
+
+    public void addDVD(String name, String type, double price) {
+        store.addDVD(name, type, price);
+    }
+
+    public void deleteDVD(String id) {
+        store.deleteDVD(id);
+    }
+
+    public void viewAvailableDVDs() {
+        store.viewAvailableDVDs();
+    }
+
+    public void searchDVD(String criteria, String value) {
+        switch (criteria.toLowerCase()) {
+            case "name":
+                store.searchByName(value);
+                break;
+            case "id":
+                store.searchByID(value);
+                break;
+            case "type":
+                store.searchByType(value);
+                break;
+            default:
+                System.out.println("Invalid search criteria.");
+        }
+    }
+}
+
+2. Buyer.java:
+package models;
+
+import controllers.DVDStore;
+import models.DVD;
+import java.util.ArrayList;
+
+public class Buyer extends User {
+    private DVDStore store;
+
+    public Buyer(String username, String password, DVDStore store) {
+        super(username, password);
+        this.store = store;
+    }
+
+    @Override
+    public void displayRole() {
+        System.out.println("Role: Buyer");
+    }
+
+    public void purchaseDVDs(ArrayList<String> dvdIDs) {
+        ArrayList<DVD> purchasedDVDs = new ArrayList<>();
+        for (String id : dvdIDs) {
+            DVD dvd = store.getDVDById(id);
+            if (dvd != null) {
+                purchasedDVDs.add(dvd);
+            } else {
+                System.out.println("DVD with ID " + id + " not found.");
+            }
+        }
+        double totalPrice = store.calculateTotalPrice(purchasedDVDs);
+        System.out.println("Total price after discount (if applicable): " + totalPrice);
+    }
+
+    public void viewAvailableDVDs() {
+        store.viewAvailableDVDs();
+    }
+}
+
+3. DVD.java:
+package models;
+
+public abstract class DVD {
+    private String name;
+    private String id;
+    private String type;
+    private double price;
+
+    public DVD(String name, int order, String type, double price) {
+        this.name = name;
+        this.type = type;
+        this.price = price;
+        this.id = generateID(order, name, type);
+    }
+
+    private String generateID(int order, String name, String type) {
+        int letterOrder = Character.toLowerCase(name.charAt(0)) - 'a' + 1;
+        String typeCode = type.equalsIgnoreCase("music") ? "11" : "12";
+        return String.format("%d%d%s", order, letterOrder, typeCode);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public abstract String getDetails();
+
+    @Deprecated
+    public String getLegacyDetails() {
+        return "[LEGACY] DVD: " + name + " (" + id + ")";
+    }
+}
+
+4. FilmDVD.java:
+package models;
+
+public class FilmDVD extends DVD {
+    public FilmDVD(String name, int order, double price) {
+        super(name, order, "Film", price);
+    }
+
+    @Override
+    public String getDetails() {
+        return "Film DVD [Name: " + getName() + ", ID: " + getId() + ", Price: " + getPrice() + "]";
+    }
+}
+
+5. MusicDVD.java:
+package models;
+
+public class MusicDVD extends DVD {
+    public MusicDVD(String name, int order, double price) {
+        super(name, order, "Music", price);
+    }
+
+    @Override
+    public String getDetails() {
+        return "Music DVD [Name: " + getName() + ", ID: " + getId() + ", Price: " + getPrice() + "]";
+    }
+}
+
+6. User.java:
+package models;
+
+public abstract class User {
+    protected String username;
+    protected String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean login(String username, String password) {
+        return this.username.equals(username) && this.password.equals(password);
+    }
+
+    public abstract void displayRole();
+}
+
+folder views:
+1. DVDStoreApp.java:
+package view;
+
+import controllers.DVDStore;
+import controllers.Registration;
+import models.Admin;
+import models.Buyer;
+import models.User;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class DVDStoreApp {
+
+    private static ArrayList<User> registeredUsers = new ArrayList<>();
+
+    public static void main(String[] args) {
+        DVDStore store = new DVDStore();
+        Admin admin = new Admin("admin", "admin123", store);
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("====== Welcome to the DVD Store! by Kelompok 4 ======");
+        System.out.println("");
+
+        while (true) {
+            System.out.print("Login as (admin/buyer/register): ");
+            String role = scanner.nextLine();
+
+            if (role.equalsIgnoreCase("register")) {
+                registerUser(scanner);
+                continue;
+            }
+
+            if (role.equalsIgnoreCase("buyer")) {
+                loginAsBuyer(scanner, store);
+                continue;
+            }
+
+            if (role.equalsIgnoreCase("admin")) {
+                System.out.print("Enter username: ");
+                String username = scanner.nextLine();
+                System.out.print("Enter password: ");
+                String password = scanner.nextLine();
+
+                if (admin.login(username, password)) {
+                    System.out.println("Admin logged in.");
+                    adminMenu(admin, scanner);
+                } else {
+                    System.out.println("Invalid admin credentials.");
+                }
+            }
+        }
+    }
+
+    private static void registerUser(Scanner scanner) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+        Buyer newUser = new Buyer(username, password, null);
+        registeredUsers.add(newUser);
+        System.out.println("Registration successful! Please login as buyer to access features.");
+    }
+
+    private static void loginAsBuyer(Scanner scanner, DVDStore store) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        for (User user : registeredUsers) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                System.out.println("Buyer logged in.");
+                Buyer buyer = new Buyer(username, password, store);
+                buyerMenu(buyer, scanner);
+                return;
+            }
+        }
+        System.out.println("Invalid buyer credentials.");
+    }
+
+    private static void adminMenu(Admin admin, Scanner scanner) {
+        while (true) {
+            System.out.println("1. Add DVD\n2. Delete DVD\n3. List DVD\n4. Search DVD\n5. Logout");
+            String choice = scanner.nextLine();
+            if (choice.equals("1")) {
+                System.out.print("Enter DVD name: ");
+                String name = scanner.nextLine();
+                System.out.print("Enter DVD type (music/film): ");
+                String type = scanner.nextLine();
+                System.out.print("Enter DVD price: ");
+                double price = Double.parseDouble(scanner.nextLine());
+                admin.addDVD(name, type, price);
+            } else if (choice.equals("2")) {
+                System.out.print("Enter DVD ID to delete: ");
+                String id = scanner.nextLine();
+                admin.deleteDVD(id);
+            } else if (choice.equals("3")) {
+                admin.viewAvailableDVDs();
+            } else if (choice.equals("4")) {
+                System.out.print("Search by (name/id/type): ");
+                String criteria = scanner.nextLine();
+                System.out.print("Enter value: ");
+                String value = scanner.nextLine();
+                admin.searchDVD(criteria, value);
+            } else if (choice.equals("5")) {
+                break;
+            }
+        }
+    }
+
+    private static void buyerMenu(Buyer buyer, Scanner scanner) {
+        while (true) {
+            System.out.println("1. Purchase DVDs\n2. View Available DVDs\n3. Logout");
+            String choice = scanner.nextLine();
+            if (choice.equals("1")) {
+                ArrayList<String> dvdIDs = new ArrayList<>();
+                System.out.println("Enter DVD IDs to purchase (type 'done' to finish): ");
+                while (true) {
+                    String id = scanner.nextLine();
+                    if (id.equalsIgnoreCase("done")) break;
+                    dvdIDs.add(id);
+                }
+                buyer.purchaseDVDs(dvdIDs);
+            } else if (choice.equals("2")) {
+                buyer.viewAvailableDVDs();
+            } else if (choice.equals("3")) {
+                break;
+            }
+        }
+    }
+}
+

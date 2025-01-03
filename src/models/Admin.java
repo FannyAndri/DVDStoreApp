@@ -9,7 +9,7 @@ public class Admin extends User {
         super(username, password);
         this.store = store;
     }
-
+    
     public void addDVD(String name, String type, double price) {
         store.addDVD(name, type, price);
     }
